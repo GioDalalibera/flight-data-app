@@ -1,4 +1,4 @@
-package com.giovannedalalibera.flightdata;
+package com.giojo.flightdata;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
