@@ -3,6 +3,7 @@ package com.giojo.flightdata.flight.dto;
 import java.time.Instant;
 
 public record FlightResponse(
+                long id,
                 String airlineName,
                 String supplierName,
                 long ticketFareCents,

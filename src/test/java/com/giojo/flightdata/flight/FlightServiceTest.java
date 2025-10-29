@@ -1,5 +1,6 @@
 package com.giojo.flightdata.flight;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,13 +67,14 @@ public class FlightServiceTest {
 
         FlightResponse result = flightService.getFlight(flightId);
 
-        assertEquals(flight.getAirlineName(), result.airlineName());
-        assertEquals(flight.getSupplierName(), result.supplierName());
-        assertEquals(flight.getTicketFareCents(), result.ticketFareCents());
-        assertEquals(flight.getDepartureAirportCode(), result.departureAirportCode());
-        assertEquals(flight.getDestinationAirportCode(), result.destinationAirportCode());
-        assertEquals(flight.getDepartureTimeUtc(), result.departureTimeUtc());
-        assertEquals(flight.getArrivalTimeUtc(), result.arrivalTimeUtc());
+        Assertions.assertAll(
+                () -> assertEquals(flight.getAirlineName(), result.airlineName()),
+                () -> assertEquals(flight.getSupplierName(), result.supplierName()),
+                () -> assertEquals(flight.getTicketFareCents(), result.ticketFareCents()),
+                () -> assertEquals(flight.getDepartureAirportCode(), result.departureAirportCode()),
+                () -> assertEquals(flight.getDestinationAirportCode(), result.destinationAirportCode()),
+                () -> assertEquals(flight.getDepartureTimeUtc(), result.departureTimeUtc()),
+                () -> assertEquals(flight.getArrivalTimeUtc(), result.arrivalTimeUtc()));
 
         verify(flightMapper, times(1)).toResponse(flight);
         verify(flightRepository, times(1)).findById(eq(flightId));
@@ -105,13 +108,14 @@ public class FlightServiceTest {
 
         FlightResponse savedResult = flightService.createFlight(flightRequest);
 
-        assertEquals(flightRequest.airlineName(), savedResult.airlineName());
-        assertEquals(flightRequest.supplierName(), savedResult.supplierName());
-        assertEquals(flightRequest.ticketFareCents(), savedResult.ticketFareCents());
-        assertEquals(flightRequest.departureAirportCode(), savedResult.departureAirportCode());
-        assertEquals(flightRequest.destinationAirportCode(), savedResult.destinationAirportCode());
-        assertEquals(flightRequest.departureTimeUtc(), savedResult.departureTimeUtc());
-        assertEquals(flightRequest.arrivalTimeUtc(), savedResult.arrivalTimeUtc());
+        assertAll(
+                () -> assertEquals(flightRequest.airlineName(), savedResult.airlineName()),
+                () -> assertEquals(flightRequest.supplierName(), savedResult.supplierName()),
+                () -> assertEquals(flightRequest.ticketFareCents(), savedResult.ticketFareCents()),
+                () -> assertEquals(flightRequest.departureAirportCode(), savedResult.departureAirportCode()),
+                () -> assertEquals(flightRequest.destinationAirportCode(), savedResult.destinationAirportCode()),
+                () -> assertEquals(flightRequest.departureTimeUtc(), savedResult.departureTimeUtc()),
+                () -> assertEquals(flightRequest.arrivalTimeUtc(), savedResult.arrivalTimeUtc()));
 
         verify(flightMapper, times(1)).toEntity(flightRequest);
         verify(flightMapper, times(1)).toResponse(flight);
@@ -193,7 +197,8 @@ public class FlightServiceTest {
     }
 
     private FlightResponse getResponseFromFlight(Flight flight) {
-        return new FlightResponse(flight.getAirlineName(),
+        return new FlightResponse(flight.getId(),
+                flight.getAirlineName(),
                 flight.getSupplierName(),
                 flight.getTicketFareCents(),
                 flight.getDepartureAirportCode(),
