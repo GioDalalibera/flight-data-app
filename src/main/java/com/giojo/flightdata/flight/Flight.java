@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.Objects;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Entity
@@ -15,18 +18,26 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
+    @Size(max = 60)
     @Column(nullable = false, length = 60)
     private String airlineName;
 
+    @NotBlank
+    @Size(max = 60)
     @Column(nullable = false, length = 60)
     private String supplierName;
 
     @Column(nullable = false)
     private long ticketFareCents;
 
+    @NotBlank
+    @Pattern(regexp = "[A-Za-z]{3}")
     @Column(nullable = false, length = 3)
     private String departureAirportCode;
 
+    @NotBlank
+    @Pattern(regexp = "[A-Za-z]{3}")
     @Column(nullable = false, length = 3)
     private String destinationAirportCode;
 
@@ -35,6 +46,23 @@ public class Flight {
 
     @Column(nullable = false)
     private Instant arrivalTimeUtc;
+
+    @PrePersist
+    @PreUpdate
+    void normalize() {
+        if (airlineName != null) {
+            airlineName = airlineName.trim();
+        }
+        if (supplierName != null) {
+            supplierName = supplierName.trim();
+        }
+        if (departureAirportCode != null) {
+            departureAirportCode = departureAirportCode.trim().toUpperCase();
+        }
+        if (destinationAirportCode != null) {
+            destinationAirportCode = destinationAirportCode.trim().toUpperCase();
+        }
+    }
 
     protected Flight() {
     }
@@ -47,7 +75,6 @@ public class Flight {
             Instant departureTimeUtc,
             Instant arrivalTimeUtc) {
 
-        long fare = Objects.requireNonNull(ticketFareCents, "ticketFareCents");
         Instant departureTime = Objects.requireNonNull(departureTimeUtc, "departureTimeUtc");
         Instant arrivalTime = Objects.requireNonNull(arrivalTimeUtc, "arrivalTimeUtc");
         String dep = Objects.requireNonNull(departureAirportCode, "departureAirportCode").toUpperCase();
@@ -59,20 +86,52 @@ public class Flight {
         if (!arrivalTime.isAfter(departureTime)) {
             throw new IllegalArgumentException("Arrival time must be after departure time.");
         }
-        if (fare < 0) {
+        if (ticketFareCents < 0) {
             throw new IllegalArgumentException("Ticket fare can't be negative.");
         }
 
         var flight = new Flight();
         flight.airlineName = airlineName;
         flight.supplierName = supplierName;
-        flight.ticketFareCents = fare;
+        flight.ticketFareCents = ticketFareCents;
         flight.departureAirportCode = dep;
         flight.destinationAirportCode = dest;
         flight.departureTimeUtc = departureTime;
         flight.arrivalTimeUtc = arrivalTime;
 
         return flight;
+    }
+
+    public void applyUpdate(String airlineName,
+            String supplierName,
+            long ticketFareCents,
+            String departureAirportCode,
+            String destinationAirportCode,
+            Instant departureTimeUtc,
+            Instant arrivalTimeUtc) {
+
+        Instant departureTime = Objects.requireNonNull(departureTimeUtc, "departureTimeUtc");
+        Instant arrivalTime = Objects.requireNonNull(arrivalTimeUtc, "arrivalTimeUtc");
+        String dep = Objects.requireNonNull(departureAirportCode, "departureAirportCode").toUpperCase();
+        String dest = Objects.requireNonNull(destinationAirportCode, "destinationAirportCode").toUpperCase();
+
+        if (dep.equals(dest)) {
+            throw new IllegalArgumentException("Destination airport and departure airport can't be the same.");
+        }
+        if (!arrivalTime.isAfter(departureTime)) {
+            throw new IllegalArgumentException("Arrival time must be after departure time.");
+        }
+        if (ticketFareCents < 0) {
+            throw new IllegalArgumentException("Ticket fare can't be negative.");
+        }
+
+        this.airlineName = airlineName;
+        this.supplierName = supplierName;
+        this.ticketFareCents = ticketFareCents;
+        this.departureAirportCode = dep;
+        this.destinationAirportCode = dest;
+        this.departureTimeUtc = departureTime;
+        this.arrivalTimeUtc = arrivalTime;
     }
 
 }

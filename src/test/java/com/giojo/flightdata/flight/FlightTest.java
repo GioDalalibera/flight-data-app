@@ -66,4 +66,21 @@ public class FlightTest {
                 assertEquals(ARRIVAL_TIME_UTC, flight.getArrivalTimeUtc());
         }
 
+        @Test
+        public void applyUpdates() {
+                var flight = Flight.create(AIRLINE_NAME, SUPPLIER_NAME, TICKET_FARE, DEPARTURE_AIRPORT_CODE,
+                                DESTINATION_AIRPORT_CODE, DEPARTURE_TIME_UTC, ARRIVAL_TIME_UTC);
+
+                flight.applyUpdate("Azul", "FlightAppData", 50, "CWB",
+                                "GRU", flight.getDepartureTimeUtc(), flight.getArrivalTimeUtc());
+
+                assertEquals("Azul", flight.getAirlineName());
+                assertEquals("FlightAppData", flight.getSupplierName());
+                assertEquals(50, flight.getTicketFareCents());
+                assertEquals("CWB", flight.getDepartureAirportCode());
+                assertEquals("GRU", flight.getDestinationAirportCode());
+                assertEquals(DEPARTURE_TIME_UTC, flight.getDepartureTimeUtc());
+                assertEquals(ARRIVAL_TIME_UTC, flight.getArrivalTimeUtc());
+        }
+
 }
