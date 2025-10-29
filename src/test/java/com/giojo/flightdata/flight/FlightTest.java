@@ -1,4 +1,4 @@
-package com.giojo.flightdata;
+package com.giojo.flightdata.flight;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

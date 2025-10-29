@@ -1,4 +1,4 @@
-package com.giojo.flightdata;
+package com.giojo.flightdata.flight;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

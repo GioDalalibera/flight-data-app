@@ -1,4 +1,4 @@
-package com.giojo.flightdata;
+package com.giojo.flightdata.flight;
 
 import java.time.Instant;
 import java.util.Objects;
