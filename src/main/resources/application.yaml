@@ -3,10 +3,18 @@ spring:
     active: dev
   application:
     name: Flight Data App
+    description: This application provides a REST API for managing flight data, demonstrating a typical CRUD architecture built with Spring Boot and Java 21.
+    author:
+      name: Giovanne D.
+      contact: giojo.dev@outlook.com
+    external-link: https://github.com/GioDalalibera/flight-data-app
+    current-version: v1
   jpa:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+    properties:
+      "[hibernate.jdbc.time_zone]": UTC
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -14,7 +22,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health, info
   endpoint:
     health:
       probes:
@@ -38,3 +46,10 @@ logging:
       max-file-size: 10MB
       max-history: 7
       total-size-cap: 200MB
+
+#OpenAPI docs and Swagger, disabled by default.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
