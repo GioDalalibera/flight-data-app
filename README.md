@@ -69,12 +69,21 @@ From there, you can explore and test all available endpoints directly in your br
 
 | Method | Endpoint | Description |
 |--------|-----------|--------------|
-| **GET** | `/api/flights` | List all flights (supports pagination & sorting) |
+| **GET** | `/api/flights` | List all flights (supports filter, pagination & sorting) |
 | **GET** | `/api/flights/{id}` | Get flight details by ID |
 | **POST** | `/api/flights` | Create a new flight  |
 | **PUT** | `/api/flights/{id}` | Update an existing flight |
 | **DELETE** | `/api/flights/{id}` | Delete a flight by ID |
 
-Flights pagination example: Third 3 page (0 indexed pages), 10 flights, sorted by departure airport code<br>[http://127.0.0.1:8080/api/flights?page=2&size=10&sort=departureAirportCode,asc](http://127.0.0.1:8080/api/flights?page=2&size=10&sort=departureAirportCode,asc)
+Examples: 
+- Gets the third 3 page (0 indexed pages) and 10 flights, sorted by departure airport code (all flights)<br>[http://127.0.0.1:8080/api/flights?page=2&size=10&sort=departureAirportCode,asc](http://127.0.0.1:8080/api/flights?page=2&size=10&sort=departureAirportCode,asc)
+
+- Search for British Airways flights:
+[http://127.0.0.1:8080/api/flights?airline=British%20Airways](http://127.0.0.1:8080/api/flights?airline=British%20Airways)
+
+- Search for all flights arriving in JFK:
+[http://127.0.0.1:8080/api/flights?arrival=JFK](http://127.0.0.1:8080/api/flights?arrival=JFK)
+
+- Search for all flights departuring in Dec/2025: [http://127.0.0.1:8080/api/flights?departFromUtc=2025-12-01T00:00:00Z&departToUtc=2025-12-31T23:59:59Z](http://127.0.0.1:8080/api/flights?departFromUtc=2025-12-01T00:00:00Z&departToUtc=2025-12-31T23:59:59Z)
 
 All requests and responses use **JSON**.

@@ -30,12 +30,12 @@ public class FlightService {
                 .orElseThrow(() -> new ResourceNotFoundException("Flight %d not found".formatted(id))));
     }
 
-    public Page<FlightResponse> fetchFlights(Pageable pageable) {
+    public Page<FlightResponse> fetchFlights(FlightFilter filter, Pageable pageable) {
         if (pageable.getPageSize() > MAX_PAGE_SIZE) {
             throw new BadRequestException("page_size can't exceed %d".formatted(MAX_PAGE_SIZE));
         }
-
-        return repository.findAll(pageable).map(mapper::toResponse);
+        validateFilters(filter);
+        return repository.findAll(FlightSpecifications.fromFilter(filter), pageable).map(mapper::toResponse);
     }
 
     @Transactional
@@ -54,5 +54,22 @@ public class FlightService {
     @Transactional
     public void deleteFlight(long id) {
         repository.findById(id).ifPresent(repository::delete);
+    }
+
+    private static void validateFilters(FlightFilter f) {
+        if (f == null)
+            return;
+        if (f.departFromUtc() != null && f.departToUtc() != null &&
+                f.departFromUtc().isAfter(f.departToUtc())) {
+            throw new BadRequestException("departToUtc must be after departFromUtc");
+        }
+        if (f.arriveFromUtc() != null && f.arriveToUtc() != null &&
+                f.arriveFromUtc().isAfter(f.arriveToUtc())) {
+            throw new BadRequestException("arriveToUtc must be after arriveFromUtc");
+        }
+        if (f.arriveToUtc() != null && f.departFromUtc() != null &&
+                f.departFromUtc().isAfter(f.arriveToUtc())) {
+            throw new BadRequestException("arriveToUtc must be after departFromUtc");
+        }
     }
 }

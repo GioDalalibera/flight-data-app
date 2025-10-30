@@ -60,7 +60,7 @@ class FlightControllerTest {
         Page<FlightResponse> page = new PageImpl<>(
                 List.of(response), PageRequest.of(pageNumber, pageSize, Sort.by("departureTimeUtc")), totalElements);
 
-        when(flightService.fetchFlights(any(Pageable.class))).thenReturn(page);
+        when(flightService.fetchFlights(any(FlightFilter.class), any(Pageable.class))).thenReturn(page);
 
         mvc.perform(get("/api/v1/flights")
                 .param("page", Integer.toString(pageNumber)).param("size", Integer.toString(pageSize))

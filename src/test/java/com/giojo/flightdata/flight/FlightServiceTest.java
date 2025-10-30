@@ -84,8 +84,9 @@ public class FlightServiceTest {
     @Test
     public void fetchFlightsTestPageSizeTooBig() {
         Pageable pageable = Pageable.ofSize(500);
+        var filter = new FlightFilter(null, null, null, null, null, null, null);
 
-        assertThrows(BadRequestException.class, () -> flightService.fetchFlights(pageable));
+        assertThrows(BadRequestException.class, () -> flightService.fetchFlights(filter, pageable));
         verifyNoInteractions(flightRepository, flightMapper);
     }
 

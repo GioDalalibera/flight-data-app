@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.giojo.flightdata.flight.dto.FlightResponse;
 import com.giojo.flightdata.flight.dto.FlightWriteRequest;
@@ -36,9 +37,9 @@ public class FlightController {
     }
 
     @GetMapping
-    public Page<FlightResponse> getFlights(Pageable pageable) {
-        log.debug("Getting flights...");
-        return flightService.fetchFlights(pageable);
+    public Page<FlightResponse> getFlights(@Valid @ModelAttribute FlightFilter filter, Pageable pageable) {
+        log.debug("Getting flights... {}{}", filter, pageable);
+        return flightService.fetchFlights(filter, pageable);
     }
 
     @GetMapping("/{id}")

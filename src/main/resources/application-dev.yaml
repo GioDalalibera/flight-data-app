@@ -12,6 +12,8 @@ spring:
 
 logging:
   level:
+    root: DEBUG
+    "[com.giojo.flightdata]": DEBUG
     "[org.hibernate.SQL]": warn
 
 springdoc:
