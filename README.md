@@ -21,7 +21,21 @@ In order to properly run this app, I'm assuming the environment is properly conf
 - PostgreSQL: **Only if not using Docker and you want a local DB.**
 
 # Running the app (Windows/Powershell)
-Open a terminal in the root of the project and run the following commands, according to desired environment:
+Open a terminal in the desired location and clone the project:
+```
+git clone https://github.com/GioDalalibera/flight-data-app.git
+```
+Go to the project root:
+```
+cd flight-data-app
+```
+Create the .env and .dev.env files (database credentials, copy the .env.example). Make sure to edit the new files with the correct credentials before running the project. If using Docker a new database will be created with the provided credentials.
+```
+cp .env.example .env
+cp .env.example .dev.env
+```
+After editing the files 
+Run the following commands, according to desired environment. You can skip docker if using stand alone PostgreSQL instance:
 
 ## Dev
 ```
