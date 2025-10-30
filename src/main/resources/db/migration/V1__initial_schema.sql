@@ -1,5 +1,5 @@
 create table flight (
-   id                       bigint primary key,
+   id                       bigint primary key generated always as identity,
    airline_name             varchar(60) not null,
    supplier_name            varchar(60) not null,
    ticket_fare_cents        bigint not null check ( ticket_fare_cents >= 0 ),
