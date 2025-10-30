@@ -25,4 +25,12 @@ public class GlobalExceptionHandler {
     pd.setProperty("path", req.getRequestURI());
     return pd;
   }
+
+  @ExceptionHandler(Exception.class)
+  public ProblemDetail handleException(Exception ex, HttpServletRequest req) {
+    var pd = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    pd.setTitle("Internal server error");
+    pd.setProperty("path", req.getRequestURI());
+    return pd;
+  }
 }
