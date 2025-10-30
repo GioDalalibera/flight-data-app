@@ -3,10 +3,10 @@ package com.giojo.flightdata.flight;
 import java.time.Instant;
 import java.util.Objects;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 
 @Entity
@@ -18,27 +18,21 @@ public class Flight {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 60)
     @Column(nullable = false, length = 60)
     private String airlineName;
 
-    @NotBlank
-    @Size(max = 60)
     @Column(nullable = false, length = 60)
     private String supplierName;
 
     @Column(nullable = false)
     private long ticketFareCents;
 
-    @NotBlank
-    @Pattern(regexp = "[A-Za-z]{3}")
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false, length = 3, columnDefinition = "char(3)")
+    @JdbcTypeCode(SqlTypes.CHAR)
     private String departureAirportCode;
 
-    @NotBlank
-    @Pattern(regexp = "[A-Za-z]{3}")
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false, length = 3, columnDefinition = "char(3)")
+    @JdbcTypeCode(SqlTypes.CHAR)
     private String destinationAirportCode;
 
     @Column(nullable = false)
