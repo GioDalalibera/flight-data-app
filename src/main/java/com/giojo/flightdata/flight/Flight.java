@@ -1,5 +1,7 @@
 package com.giojo.flightdata.flight;
 
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
+
 import java.time.Instant;
 import java.util.Objects;
 
@@ -8,10 +10,12 @@ import org.hibernate.type.SqlTypes;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "flight")
 @Getter
+@ToString
 public class Flight {
 
     @Id
@@ -126,6 +130,11 @@ public class Flight {
         this.destinationAirportCode = dest;
         this.departureTimeUtc = departureTime;
         this.arrivalTimeUtc = arrivalTime;
+    }
+
+    public final String toLogString() {
+        return String.format("#%s %s %s -> %s @%s", id, airlineName, departureAirportCode, destinationAirportCode,
+                departureTimeUtc != null ? ISO_INSTANT.format(departureTimeUtc) : "?");
     }
 
 }
