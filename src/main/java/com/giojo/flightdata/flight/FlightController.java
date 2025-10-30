@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/api/v1/flights")
+@RequestMapping("/api/flights")
 public class FlightController {
 
     private static final Logger log = LoggerFactory.getLogger(FlightController.class);
