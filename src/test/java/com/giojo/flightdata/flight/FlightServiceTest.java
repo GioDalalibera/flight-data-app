@@ -25,6 +25,7 @@ import com.giojo.flightdata.common.exceptions.BadRequestException;
 import com.giojo.flightdata.common.exceptions.ResourceNotFoundException;
 import com.giojo.flightdata.flight.dto.FlightResponse;
 import com.giojo.flightdata.flight.dto.FlightWriteRequest;
+import com.giojo.flightdata.flight.mappers.FlightMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class FlightServiceTest {
@@ -84,9 +85,8 @@ public class FlightServiceTest {
     @Test
     public void fetchFlightsTestPageSizeTooBig() {
         Pageable pageable = Pageable.ofSize(500);
-        var filter = new FlightFilter(null, null, null, null, null, null, null);
 
-        assertThrows(BadRequestException.class, () -> flightService.fetchFlights(filter, pageable));
+        assertThrows(BadRequestException.class, () -> flightService.fetchFlights(null, pageable));
         verifyNoInteractions(flightRepository, flightMapper);
     }
 

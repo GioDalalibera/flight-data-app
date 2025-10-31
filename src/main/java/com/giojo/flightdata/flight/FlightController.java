@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import com.giojo.flightdata.flight.dto.FlightFilter;
 import com.giojo.flightdata.flight.dto.FlightResponse;
 import com.giojo.flightdata.flight.dto.FlightWriteRequest;
 
@@ -32,7 +33,6 @@ public class FlightController {
     private final FlightService flightService;
 
     public FlightController(FlightService flightService) {
-
         this.flightService = flightService;
     }
 

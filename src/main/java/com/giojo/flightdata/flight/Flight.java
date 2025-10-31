@@ -13,7 +13,12 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "flight")
+@Table(name = "flight", indexes = {
+        @Index(name = "idx_flight_dep_code", columnList = "departureAirportCode"),
+        @Index(name = "idx_flight_dest_code", columnList = "destinationAirportCode"),
+        @Index(name = "idx_flight_departure_time", columnList = "departureTimeUtc"),
+        @Index(name = "idx_flight_arrival_time", columnList = "arrivalTimeUtc"),
+        @Index(name = "idx_flight_airline_name", columnList = "airlineName") })
 @Getter
 @ToString
 public class Flight {

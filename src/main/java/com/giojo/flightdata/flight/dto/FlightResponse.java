@@ -5,7 +5,7 @@ import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import java.time.Instant;
 
 public record FlightResponse(
-        long id,
+        Long id,
         String airlineName,
         String supplierName,
         long ticketFareCents,

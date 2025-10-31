@@ -25,254 +25,258 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.giojo.flightdata.common.exceptions.ResourceNotFoundException;
+import com.giojo.flightdata.flight.dto.FlightFilter;
 import com.giojo.flightdata.flight.dto.FlightResponse;
 import com.giojo.flightdata.flight.dto.FlightWriteRequest;
 
 @WebMvcTest(FlightController.class)
 class FlightControllerTest {
 
-    @Autowired
-    MockMvc mvc;
+        private static final String API_FLIGHTS = "/api/flights";
 
-    @Autowired
-    ObjectMapper om;
+        @Autowired
+        MockMvc mvc;
 
-    @MockitoBean
-    FlightService flightService;
+        @Autowired
+        ObjectMapper om;
 
-    @Test
-    public void getPagedFlights() throws Exception {
-        long flightId = 1L;
-        FlightResponse response = new FlightResponse(
-                flightId,
-                "Azul",
-                "CrazySupplier",
-                80,
-                "CWB",
-                "GRU",
-                Instant.parse("2025-10-10T19:00:00Z"),
-                Instant.parse("2025-10-10T21:00:00Z"));
+        @MockitoBean
+        FlightService flightService;
 
-        int pageNumber = 0;
-        int pageSize = 20;
-        int totalElements = 1;
+        @Test
+        public void getPagedFlights() throws Exception {
+                long flightId = 1L;
+                FlightResponse response = new FlightResponse(
+                                flightId,
+                                "Azul",
+                                "CrazySupplier",
+                                80,
+                                "CWB",
+                                "GRU",
+                                Instant.parse("2025-10-10T19:00:00Z"),
+                                Instant.parse("2025-10-10T21:00:00Z"));
 
-        Page<FlightResponse> page = new PageImpl<>(
-                List.of(response), PageRequest.of(pageNumber, pageSize, Sort.by("departureTimeUtc")), totalElements);
+                int pageNumber = 0;
+                int pageSize = 20;
+                int totalElements = 1;
 
-        when(flightService.fetchFlights(any(FlightFilter.class), any(Pageable.class))).thenReturn(page);
+                Page<FlightResponse> page = new PageImpl<>(
+                                List.of(response), PageRequest.of(pageNumber, pageSize, Sort.by("departureTimeUtc")),
+                                totalElements);
 
-        mvc.perform(get("/api/v1/flights")
-                .param("page", Integer.toString(pageNumber)).param("size", Integer.toString(pageSize))
-                .param("sort", "departureTimeUtc,asc"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.content[0].id").value(flightId))
-                .andExpect(jsonPath("$.size").value(pageSize))
-                .andExpect(jsonPath("$.number").value(pageNumber))
-                .andExpect(jsonPath("$.totalElements").value(totalElements));
-    }
+                when(flightService.fetchFlights(any(FlightFilter.class), any(Pageable.class))).thenReturn(page);
 
-    @Test
-    public void getFlight() throws Exception {
-        long flightId = 7L;
-        FlightResponse response = new FlightResponse(
-                flightId,
-                "Azul",
-                "CrazySupplier",
-                80,
-                "CWB",
-                "GRU",
-                Instant.parse("2025-10-10T19:00:00Z"),
-                Instant.parse("2025-10-10T21:00:00Z"));
+                mvc.perform(get(API_FLIGHTS)
+                                .param("page", Integer.toString(pageNumber))
+                                .param("size", Integer.toString(pageSize)))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(jsonPath("$.content[0].id").value(flightId))
+                                .andExpect(jsonPath("$.size").value(pageSize))
+                                .andExpect(jsonPath("$.number").value(pageNumber))
+                                .andExpect(jsonPath("$.totalElements").value(totalElements));
+        }
 
-        when(flightService.getFlight(eq(flightId))).thenReturn(response);
+        @Test
+        public void getFlight() throws Exception {
+                long flightId = 7L;
+                FlightResponse response = new FlightResponse(
+                                flightId,
+                                "Azul",
+                                "CrazySupplier",
+                                80,
+                                "CWB",
+                                "GRU",
+                                Instant.parse("2025-10-10T19:00:00Z"),
+                                Instant.parse("2025-10-10T21:00:00Z"));
 
-        mvc.perform(get("/api/v1/flights/" + flightId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(flightId))
-                .andExpect(jsonPath("$.airlineName").value("Azul"))
-                .andExpect(jsonPath("$.supplierName").value("CrazySupplier"))
-                .andExpect(jsonPath("$.departureAirportCode").value("CWB"))
-                .andExpect(jsonPath("$.destinationAirportCode").value("GRU"));
-    }
+                when(flightService.getFlight(eq(flightId))).thenReturn(response);
 
-    @Test
-    public void getFlightNotFound() throws Exception {
-        long flightId = 7L;
-        when(flightService.getFlight(eq(flightId))).thenThrow(ResourceNotFoundException.class);
+                mvc.perform(get("%s/%s".formatted(API_FLIGHTS, flightId)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.id").value(flightId))
+                                .andExpect(jsonPath("$.airlineName").value("Azul"))
+                                .andExpect(jsonPath("$.supplierName").value("CrazySupplier"))
+                                .andExpect(jsonPath("$.departureAirportCode").value("CWB"))
+                                .andExpect(jsonPath("$.destinationAirportCode").value("GRU"));
+        }
 
-        mvc.perform(get("/api/v1/flights/" + flightId))
-                .andExpect(status().isNotFound());
-    }
+        @Test
+        public void getFlightNotFound() throws Exception {
+                long flightId = 7L;
+                when(flightService.getFlight(eq(flightId))).thenThrow(ResourceNotFoundException.class);
 
-    @Test
-    public void createFlight() throws Exception {
-        FlightWriteRequest request = new FlightWriteRequest(
-                "Delta",
-                "FlightDataApp",
-                79,
-                "GRU",
-                "LIS",
-                Instant.parse("2025-10-10T19:00:00Z"),
-                Instant.parse("2025-10-11T21:00:00Z"));
+                mvc.perform(get("%s/%s".formatted(API_FLIGHTS, flightId)))
+                                .andExpect(status().isNotFound());
+        }
 
-        Long createdId = 42L;
-        FlightResponse response = new FlightResponse(createdId,
-                request.airlineName(),
-                request.supplierName(),
-                request.ticketFareCents(),
-                request.departureAirportCode(),
-                request.destinationAirportCode(),
-                request.departureTimeUtc(),
-                request.arrivalTimeUtc());
+        @Test
+        public void createFlight() throws Exception {
+                FlightWriteRequest request = new FlightWriteRequest(
+                                "Delta",
+                                "FlightDataApp",
+                                79,
+                                "GRU",
+                                "LIS",
+                                Instant.parse("2025-10-10T19:00:00Z"),
+                                Instant.parse("2025-10-11T21:00:00Z"));
 
-        when(flightService.createFlight(any())).thenReturn(response);
+                Long createdId = 42L;
+                FlightResponse response = new FlightResponse(createdId,
+                                request.airlineName(),
+                                request.supplierName(),
+                                request.ticketFareCents(),
+                                request.departureAirportCode(),
+                                request.destinationAirportCode(),
+                                request.departureTimeUtc(),
+                                request.arrivalTimeUtc());
 
-        mvc.perform(post("/api/v1/flights")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(createdId));
-    }
+                when(flightService.createFlight(any())).thenReturn(response);
 
-    @Test
-    public void updateFlight() throws Exception {
-        FlightWriteRequest request = new FlightWriteRequest(
-                "Delta",
-                "FlightDataApp",
-                79,
-                "GRU",
-                "LIS",
-                Instant.parse("2025-10-10T19:00:00Z"),
-                Instant.parse("2025-10-11T21:00:00Z"));
+                mvc.perform(post(API_FLIGHTS)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsString(request)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.id").value(createdId));
+        }
 
-        Long flightId = 42L;
-        FlightResponse response = getResponseFromFlightWriteRequest(flightId, request);
+        @Test
+        public void updateFlight() throws Exception {
+                FlightWriteRequest request = new FlightWriteRequest(
+                                "Delta",
+                                "FlightDataApp",
+                                79,
+                                "GRU",
+                                "LIS",
+                                Instant.parse("2025-10-10T19:00:00Z"),
+                                Instant.parse("2025-10-11T21:00:00Z"));
 
-        when(flightService.updateFlight(eq(flightId), eq(request))).thenReturn(response);
+                Long flightId = 42L;
+                FlightResponse response = getResponseFromFlightWriteRequest(flightId, request);
 
-        mvc.perform(put("/api/v1/flights/42")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.airlineName").value(request.airlineName()))
-                .andExpect(jsonPath("$.supplierName").value(request.supplierName()))
-                .andExpect(jsonPath("$.departureAirportCode").value(request.departureAirportCode()))
-                .andExpect(jsonPath("$.destinationAirportCode").value(request.destinationAirportCode()))
-                .andExpect(jsonPath("$.ticketFareCents").value(request.ticketFareCents()));
-    }
+                when(flightService.updateFlight(eq(flightId), eq(request))).thenReturn(response);
 
-    @Test
-    public void updateFlightNotFound() throws Exception {
-        FlightWriteRequest request = new FlightWriteRequest(
-                "Delta",
-                "FlightDataApp",
-                79,
-                "GRU",
-                "LIS",
-                Instant.parse("2025-10-10T19:00:00Z"),
-                Instant.parse("2025-10-11T21:00:00Z"));
+                mvc.perform(put("%s/%s".formatted(API_FLIGHTS, flightId))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsString(request)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.airlineName").value(request.airlineName()))
+                                .andExpect(jsonPath("$.supplierName").value(request.supplierName()))
+                                .andExpect(jsonPath("$.departureAirportCode").value(request.departureAirportCode()))
+                                .andExpect(jsonPath("$.destinationAirportCode").value(request.destinationAirportCode()))
+                                .andExpect(jsonPath("$.ticketFareCents").value(request.ticketFareCents()));
+        }
 
-        Long flightId = 42L;
+        @Test
+        public void updateFlightNotFound() throws Exception {
+                FlightWriteRequest request = new FlightWriteRequest(
+                                "Delta",
+                                "FlightDataApp",
+                                79,
+                                "GRU",
+                                "LIS",
+                                Instant.parse("2025-10-10T19:00:00Z"),
+                                Instant.parse("2025-10-11T21:00:00Z"));
 
-        when(flightService.updateFlight(eq(flightId), eq(request))).thenThrow(ResourceNotFoundException.class);
+                Long flightId = 42L;
 
-        mvc.perform(put("/api/v1/flights/42")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(request)))
-                .andExpect(status().isNotFound());
-    }
+                when(flightService.updateFlight(eq(flightId), eq(request))).thenThrow(ResourceNotFoundException.class);
 
-    @Test
-    public void deleteFlight() throws Exception {
-        Long flightId = 10L;
-        mvc.perform(delete("/api/v1/flights/" + flightId))
-                .andExpect(status().isNoContent());
-        verify(flightService).deleteFlight(flightId);
-    }
+                mvc.perform(put("%s/%s".formatted(API_FLIGHTS, flightId))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(om.writeValueAsString(request)))
+                                .andExpect(status().isNotFound());
+        }
 
-    @Test
-    public void createFlightFailValidationBlankNames() throws Exception {
-        String badJson = """
-                {"airlineName":"", "supplierName":"", "ticketFareCents": 150,
-                 "departureAirportCode":"CWB", "destinationAirportCode":"GRU",
-                 "departureTimeUtc":"2025-10-10T12:00:00Z", "arrivalTimeUtc":"2025-10-10T19:00:00Z"}
-                """;
+        @Test
+        public void deleteFlight() throws Exception {
+                Long flightId = 10L;
+                mvc.perform(delete("%s/%s".formatted(API_FLIGHTS, flightId)))
+                                .andExpect(status().isNoContent());
+                verify(flightService).deleteFlight(flightId);
+        }
 
-        mvc.perform(post("/api/v1/flights")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(badJson))
-                .andExpect(status().isBadRequest());
+        @Test
+        public void createFlightFailValidationBlankNames() throws Exception {
+                String badJson = """
+                                {"airlineName":"", "supplierName":"", "ticketFareCents": 150,
+                                 "departureAirportCode":"CWB", "destinationAirportCode":"GRU",
+                                 "departureTimeUtc":"2025-10-10T12:00:00Z", "arrivalTimeUtc":"2025-10-10T19:00:00Z"}
+                                """;
 
-        verifyNoInteractions(flightService);
-    }
+                mvc.perform(post(API_FLIGHTS)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(badJson))
+                                .andExpect(status().isBadRequest());
 
-    @Test
-    public void createFlightFailValidationNegativeFare() throws Exception {
-        String badJson = """
-                {"airlineName":"Azul", "supplierName":"FlightDataApp", "ticketFareCents": -80,
-                 "departureAirportCode":"CWB", "destinationAirportCode":"GRU",
-                 "departureTimeUtc":"2025-10-10T12:00:00Z", "arrivalTimeUtc":"2025-10-10T19:00:00Z"}
-                """;
+                verifyNoInteractions(flightService);
+        }
 
-        mvc.perform(post("/api/v1/flights")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(badJson))
-                .andExpect(status().isBadRequest());
+        @Test
+        public void createFlightFailValidationNegativeFare() throws Exception {
+                String badJson = """
+                                {"airlineName":"Azul", "supplierName":"FlightDataApp", "ticketFareCents": -80,
+                                 "departureAirportCode":"CWB", "destinationAirportCode":"GRU",
+                                 "departureTimeUtc":"2025-10-10T12:00:00Z", "arrivalTimeUtc":"2025-10-10T19:00:00Z"}
+                                """;
 
-        verifyNoInteractions(flightService);
-    }
+                mvc.perform(post(API_FLIGHTS)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(badJson))
+                                .andExpect(status().isBadRequest());
 
-    @Test
-    public void createFlightFailValidationNullTimes() throws Exception {
-        String badJson = """
-                {"airlineName":"Azul", "supplierName":"FlightDataApp", "ticketFareCents": 80,
-                 "departureAirportCode":"CWB", "destinationAirportCode":"GRU",
-                 "departureTimeUtc":null, "arrivalTimeUtc":null}
-                """;
+                verifyNoInteractions(flightService);
+        }
 
-        mvc.perform(post("/api/v1/flights")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(badJson))
-                .andExpect(status().isBadRequest());
+        @Test
+        public void createFlightFailValidationNullTimes() throws Exception {
+                String badJson = """
+                                {"airlineName":"Azul", "supplierName":"FlightDataApp", "ticketFareCents": 80,
+                                 "departureAirportCode":"CWB", "destinationAirportCode":"GRU",
+                                 "departureTimeUtc":null, "arrivalTimeUtc":null}
+                                """;
 
-        verifyNoInteractions(flightService);
-    }
+                mvc.perform(post(API_FLIGHTS)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(badJson))
+                                .andExpect(status().isBadRequest());
 
-    @Test
-    public void createFlightFailValidationNullAirportCodes() throws Exception {
-        String badJson = """
-                {"airlineName":"Azul", "supplierName":"FlightDataApp", "ticketFareCents": -80,
-                 "departureAirportCode":null, "destinationAirportCode":null,
-                 "departureTimeUtc":"2025-10-10T12:00:00Z", "arrivalTimeUtc":"2025-10-10T19:00:00Z"}
-                """;
+                verifyNoInteractions(flightService);
+        }
 
-        mvc.perform(post("/api/v1/flights")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(badJson))
-                .andExpect(status().isBadRequest());
+        @Test
+        public void createFlightFailValidationNullAirportCodes() throws Exception {
+                String badJson = """
+                                {"airlineName":"Azul", "supplierName":"FlightDataApp", "ticketFareCents": -80,
+                                 "departureAirportCode":null, "destinationAirportCode":null,
+                                 "departureTimeUtc":"2025-10-10T12:00:00Z", "arrivalTimeUtc":"2025-10-10T19:00:00Z"}
+                                """;
 
-        verifyNoInteractions(flightService);
-    }
+                mvc.perform(post(API_FLIGHTS)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(badJson))
+                                .andExpect(status().isBadRequest());
 
-    @Test
-    public void genericExceptionHandler() throws Exception {
-        long flightId = 7L;
-        when(flightService.getFlight(eq(flightId))).thenThrow(NullPointerException.class);
+                verifyNoInteractions(flightService);
+        }
 
-        mvc.perform(get("/api/v1/flights/" + flightId))
-                .andExpect(status().isInternalServerError());
-    }
+        @Test
+        public void genericExceptionHandler() throws Exception {
+                long flightId = 7L;
+                when(flightService.getFlight(eq(flightId))).thenThrow(NullPointerException.class);
 
-    private FlightResponse getResponseFromFlightWriteRequest(Long id, FlightWriteRequest flightRequest) {
-        return new FlightResponse(id,
-                flightRequest.airlineName(),
-                flightRequest.supplierName(),
-                flightRequest.ticketFareCents(),
-                flightRequest.departureAirportCode(),
-                flightRequest.destinationAirportCode(),
-                flightRequest.departureTimeUtc(),
-                flightRequest.arrivalTimeUtc());
-    }
+                mvc.perform(get("%s/%s".formatted(API_FLIGHTS, flightId)))
+                                .andExpect(status().isInternalServerError());
+        }
+
+        private FlightResponse getResponseFromFlightWriteRequest(Long id, FlightWriteRequest flightRequest) {
+                return new FlightResponse(id,
+                                flightRequest.airlineName(),
+                                flightRequest.supplierName(),
+                                flightRequest.ticketFareCents(),
+                                flightRequest.departureAirportCode(),
+                                flightRequest.destinationAirportCode(),
+                                flightRequest.departureTimeUtc(),
+                                flightRequest.arrivalTimeUtc());
+        }
 }

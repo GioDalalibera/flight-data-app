@@ -2,6 +2,9 @@ package com.giojo.flightdata.flight;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.giojo.flightdata.common.utils.DateTimeUtils;
+import com.giojo.flightdata.flight.dto.FlightFilter;
+
 import jakarta.persistence.criteria.Predicate;
 
 public final class FlightSpecifications {
@@ -29,16 +32,20 @@ public final class FlightSpecifications {
                         f.destination().trim().toUpperCase()));
             }
             if (f.departFromUtc() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("departureTimeUtc"), f.departFromUtc()));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("departureTimeUtc"),
+                        DateTimeUtils.startOfDayUtc(f.departFromUtc())));
             }
             if (f.departToUtc() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("departureTimeUtc"), f.departToUtc()));
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("departureTimeUtc"), DateTimeUtils.endOfDayUtc(f.departToUtc())));
             }
             if (f.arriveFromUtc() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("arrivalTimeUtc"), f.arriveFromUtc()));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("arrivalTimeUtc"),
+                        DateTimeUtils.startOfDayUtc(f.arriveFromUtc())));
             }
             if (f.arriveToUtc() != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("arrivalTimeUtc"), f.arriveToUtc()));
+                predicates.add(
+                        cb.lessThanOrEqualTo(root.get("arrivalTimeUtc"), DateTimeUtils.endOfDayUtc(f.arriveToUtc())));
             }
 
             return cb.and(predicates.toArray(Predicate[]::new));

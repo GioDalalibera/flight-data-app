@@ -53,3 +53,6 @@ springdoc:
     enabled: false
   swagger-ui:
     enabled: false
+
+crazy-supplier:
+  base-url: "https://api.crazy-supplier.com"

@@ -12,7 +12,7 @@ spring:
 
 logging:
   level:
-    root: DEBUG
+    root: INFO
     "[com.giojo.flightdata]": DEBUG
     "[org.hibernate.SQL]": warn
 

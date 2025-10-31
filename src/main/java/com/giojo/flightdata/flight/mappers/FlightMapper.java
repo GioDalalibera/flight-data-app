@@ -1,8 +1,9 @@
-package com.giojo.flightdata.flight;
+package com.giojo.flightdata.flight.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
+import com.giojo.flightdata.flight.Flight;
 import com.giojo.flightdata.flight.dto.FlightResponse;
 import com.giojo.flightdata.flight.dto.FlightWriteRequest;
 
