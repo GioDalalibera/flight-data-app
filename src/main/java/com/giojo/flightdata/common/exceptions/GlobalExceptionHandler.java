@@ -2,6 +2,7 @@ package com.giojo.flightdata.common.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,6 +23,14 @@ public class GlobalExceptionHandler {
   public ProblemDetail handleBadRequest(BadRequestException ex, HttpServletRequest req) {
     var pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     pd.setTitle("Bad request");
+    pd.setProperty("path", req.getRequestURI());
+    return pd;
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ProblemDetail handleArgumentNotValid(MethodArgumentNotValidException ex, HttpServletRequest req) {
+    var pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    pd.setTitle("Invalid arguments");
     pd.setProperty("path", req.getRequestURI());
     return pd;
   }
