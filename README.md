@@ -96,8 +96,12 @@ Examples:
 [http://127.0.0.1:8080/api/flights?airline=British%20Airways](http://127.0.0.1:8080/api/flights?airline=British%20Airways)
 
 - Search for all flights arriving in JFK:
-[http://127.0.0.1:8080/api/flights?arrival=JFK](http://127.0.0.1:8080/api/flights?arrival=JFK)
+[http://127.0.0.1:8080/api/flights?destination=JFK](http://127.0.0.1:8080/api/flights?destination=JFK)
 
-- Search for all flights departuring in Dec/2025: [http://127.0.0.1:8080/api/flights?departFromUtc=2025-12-01T00:00:00Z&departToUtc=2025-12-31T23:59:59Z](http://127.0.0.1:8080/api/flights?departFromUtc=2025-12-01T00:00:00Z&departToUtc=2025-12-31T23:59:59Z)
+- Search for all flights departuring in Dec/2025: [http://127.0.0.1:8080/api/flights?departFromUtc=2025-12-01&departToUtc=2025-12-31](http://127.0.0.1:8080/api/flights?departFromUtc=2025-12-01&departToUtc=2025-12-31)
+
+- Search for flights departuring in Dec/2025 from "Japan Airlines": [http://127.0.0.1:8080/api/flights?airline=japan&departFromUtc=2025-12-01&departToUtc=2025-12-31](http://127.0.0.1:8080/api/flights?airline=japan&departFromUtc=2025-12-01&departToUtc=2025-12-31)
+
+
 
 All requests and responses use **JSON**.
